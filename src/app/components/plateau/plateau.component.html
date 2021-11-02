@@ -1,0 +1,23 @@
+<div class="col-12 col-md-6">
+    <div class="isPrime legend-box d-inline-block"> </div>
+    <span> Cell where x+y is a prime number.</span>
+</div>
+
+<table class="table table-bordered bg-white mt-3">
+    <tbody>
+        <tr scope="row" *ngFor="let y of yRows">
+            <th scope="col" *ngFor="let x of xCols" [ngClass]="isCellCoordPrime(x + y) ? 'isPrime' : ''">
+                <small>{{x}},{{y}}</small>
+                <ng-container *ngFor="let rover of getRovers(x,y)">
+                    <img src="../../assets/rover.jpg"
+                         class="img-rover mx-auto d-block p-2"
+                         [ngClass]="[rover.orientation.toUpperCase() === 'N' ? 'rotate-n' : '', rover.orientation.toUpperCase() === 'S' ? 'rotate-s' : '', rover.orientation.toUpperCase() === 'W' ? 'rotate-w' : '']">
+                </ng-container>
+            </th>
+        </tr>
+    </tbody>
+</table>
+
+    
+
+

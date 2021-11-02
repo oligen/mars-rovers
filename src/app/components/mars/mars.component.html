@@ -1,0 +1,197 @@
+<div class="container mars-container">
+    <div class="row p-3 mt-4 rounded bg-light text-black">  
+        <div class="col-12">
+            <h3>Mars mission</h3>
+        </div>
+
+        <!-- Input plateau upper right coordinates -->
+        <div class="col-12 col-md-6 mt-3 mt-md-0">
+            <label for="inputUpperRightCoord">
+                <strong>Enter the plateau upper right coordinates</strong>
+            </label>
+            <div class="row">
+                <div class="col-12 col-md-6 mt-3 mt-md-0">
+                    <label for="inputUpperRightXCoord">X coordinate</label>
+                    <input ngModel 
+                        required
+                        type="number" 
+                        class="form-control" 
+                        [ngModel]="inputUpperRightXCoord" 
+                        (ngModelChange)="upperRightXCoordChange($event)"
+                        id="inputUpperRightXCoord" 
+                        placeholder="Enter a number"
+                        min="1">
+                </div>
+
+                <div class="col-12 col-md-6 mt-3 mt-md-0">
+                    <label for="inputUpperRightYCoord">Y coordinate</label>
+                    <input ngModel 
+                        required
+                        type="number" 
+                        class="form-control"
+                        [ngModel]="inputUpperRightYCoord" 
+                        (ngModelChange)="upperRightYCoordChange($event)" 
+                        id="inputUpperRightYCoord" 
+                        placeholder="Enter a number"
+                        min="1">
+                </div>
+            </div>
+        </div>
+
+        <!-- List of rovers. -->
+        <div class="col-12 col-md-8 mt-3">
+            <strong>Rovers ready for mission</strong>
+            <ul class="list-group">
+                <li class="list-group-item" *ngFor="let rover of roverList; let i = index">
+                    {{i}}. Position: {{rover.xCoord}}, {{rover.yCoord}}, {{rover.orientation}}. Instructions: {{rover.instructions}}
+                </li>
+            </ul>
+        </div>
+
+        <!-- Add new rover. -->
+        <div class="col-12 mt-3">
+            <strong>Add new rover</strong>
+            <ng-container *ngIf="!missionStarted">
+                <form #rover="ngForm" (ngSubmit)="addRover(rover.value)">
+                    <div class="row">
+                        <div class="col-12 col-md-2">
+                            <label for="inputXCoordinate">X coordinate</label>
+                            <input ngModel 
+                                required
+                                type="number" 
+                                name="roverXCoord" 
+                                class="form-control" 
+                                id="inputXCoordinate" 
+                                placeholder="Enter a number"
+                                min="0"
+                                [max]="maxXCoord">
+                        </div>
+
+                        <div class="col-12 col-md-2 mt-2 mt-md-0">
+                            <label for="inputYCoordinate">Y coordinate</label>
+                            <input ngModel 
+                                required
+                                type="number" 
+                                name="roverYCoord" 
+                                class="form-control" 
+                                id="inputYCoordinate" 
+                                placeholder="Enter a number"
+                                min="0"
+                                [max]="maxYCoord">
+                        </div>
+
+                        <div class="col-12 col-md-4 mt-2 mt-md-0">
+                            <label for="inputOrientation">Orientation(N or E or S or W)</label>
+                            <!-- <select class="" id="inputOrientation" name="roverOrientation" >
+                                <option>Select orientation</option>
+                                <option>N</option>
+                                <option>E</option>
+                                <option>S</option>
+                                <option>W</option>
+                            </select> -->
+
+                            <input ngModel 
+                                required
+                                type="text" 
+                                name="roverOrientation" 
+                                class="form-control text-uppercase" 
+                                id="inputOrientation" 
+                                placeholder="N, E, S, W">
+                        </div>
+
+                        <div class="col-12 col-md-3 mt-2 mt-md-0">
+                            <label for="inputInstruction">Instructions</label>
+                            <input ngModel 
+                                required
+                                type="text" 
+                                name="roverInstructions" 
+                                class="form-control text-uppercase" 
+                                id="inputYCoordinate" 
+                                placeholder="L,M,R,M">
+                        </div>
+
+                        <div class="col-12">
+                            <br>
+                            <button id="btnSubmitRover" type="submit" class="btn btn-secondary">Add</button>
+                        </div>
+                    </div>
+                </form>
+            </ng-container>
+        </div>
+        
+        <div class="col-12 col-md-8 mt-3">
+            <div class="form-check">
+                <input class="form-check-input" 
+                       type="checkbox" 
+                       [(ngModel)]="showPlateau"
+                       [ngModelOptions]="{standalone: true}"
+                       value="" 
+                       id="displayPlateau">
+                <label class="form-check-label" for="displayPlateau">
+                  Display rovers on Mars' plateau.
+                </label>
+              </div>
+        </div>
+    </div>
+
+    <!-- Action buttons. -->
+    <div class="row p-3 mt-3 bg-light rounded text-black">
+        <div class="col-12">
+            <button *ngIf="!missionCompleted"
+                    type="button" 
+                    class="btn mx-1" 
+                    [disabled]="missionStarted" 
+                    [ngClass]="!missionStarted ? 'btn-primary' : 'btn-light'"
+                    (click)="startMission()" >
+                {{!missionStarted ? 'Start mission' : 'Mission started!'}}</button>
+    
+            <div *ngIf="missionCompleted" class="d-flex align-items-end">
+                <button type="button" 
+                        class="btn btn-secondary mx-1" 
+                        (click)="cancelMission()" >
+                    Reload mission</button>
+            </div>
+            <button *ngIf="missionStarted"
+                    type="button" 
+                    class="btn mx-1 btn-dark" 
+                    (click)="cancelMission()" >
+                Cancel mission</button>
+        </div>
+
+        <div *ngIf="missionWarningMessage !== ''" class="col-12 mt-1 text-warning">
+            {{missionWarningMessage}}
+        </div>
+        
+        <div *ngIf="missionCompleted" class="col-12 mt-1 text-success">
+            <span>Mission completed</span>
+        </div>
+    </div>
+
+    <!-- Mission Report -->
+    <div *ngIf="missionStarted || missionCompleted" class="row p-3 my-3 bg-light rounded text-black">
+        <div class="col-12 col-md-8">
+            <h3 *ngIf="roverListDeployed.length > 0">Rovers' final coordinates and heading:</h3>            
+            <ul class="list-group">
+                <li class="list-group-item" *ngFor="let rover of roverListDeployed; let i = index">Rover {{i}}: {{rover.getRoverPosition()}}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div  class="row p-3 my-3 bg-light rounded text-black">
+        <!-- Plateau -->
+        <div *ngIf="showPlateau" class="col-12 plateau-container">
+            <h3>Plateau on Mars</h3>
+            <app-plateau 
+                [upperRightCoordinates]="upperRight"
+                [roverListDeployed]="!missionStarted ? roverList : roverListDeployed"></app-plateau>
+        </div>
+
+        <!-- Mission log -->
+        <div class="col-12 col-md-8 mt-3 mb-3">
+            <h3 *ngIf="missionLog.length > 0">Mission log:</h3>
+            <ul class="list-group">
+                <li class="list-group-item" *ngFor="let log of missionLog; let i = index">{{i+1}}. {{log.message}}</li>
+            </ul>
+        </div>
+    </div>
+</div>
